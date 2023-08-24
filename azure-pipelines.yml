@@ -1,0 +1,161 @@
+trigger:
+  - development
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  phpVersion: 8.1
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: 'Install Node.js'
+
+- task: DownloadSecureFile@1
+  displayName: 'Download env'
+  name: envFile
+  inputs:
+    secureFile: 'hris_dev_env'
+    
+- script: |
+    sudo update-alternatives --set php /usr/bin/php$(phpVersion)
+    sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
+    sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
+    sudo update-alternatives --set php-cgi /usr/bin/php-cgi$(phpVersion)
+    sudo update-alternatives --set phar.phar /usr/bin/phar.phar$(phpVersion)
+    php -version
+    rm composer.lock
+    chmod 755 storage
+    yarn set version berry
+    yarn set version 2.x
+    yarn install
+  displayName: 'Use PHP version $(phpVersion)'
+
+- script: composer install --no-interaction --prefer-dist
+  displayName: 'Composer install'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/vendor'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/vendor'
+    OverWrite: true
+  displayName: 'Copy vendor'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/app'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/app'
+    OverWrite: true
+  displayName: 'Copy app'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/bootstrap'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/bootstrap'
+    OverWrite: true
+  displayName: 'Copy bootstrap'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/config'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/config'
+    OverWrite: true
+  displayName: 'Copy config'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/public'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/public'
+    OverWrite: true
+  displayName: 'Copy public'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/resources'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/resources'
+    OverWrite: true
+  displayName: 'Copy resources'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/routes'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/routes'
+    OverWrite: true
+  displayName: 'Copy routes'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/storage'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/storage'
+    OverWrite: true
+  displayName: 'Copy storage'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/lang'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/lang'
+    OverWrite: true
+  displayName: 'Copy lang'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/database'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/database'
+    OverWrite: true
+  displayName: 'Copy database'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/node_modules'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/node_modules'
+    OverWrite: true
+  displayName: 'Copy node modules'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/.scripts'
+    Contents: '**'
+    TargetFolder: '$(Build.BinariesDirectory)/.scripts'
+    OverWrite: true
+  displayName: 'Copy deployment scripts'
+
+- script: |    
+    cp $(envFile.secureFilePath) $(Build.BinariesDirectory)/app.env #For build artifact
+    cp appspec.yml $(Build.BinariesDirectory)
+    cp artisan $(Build.BinariesDirectory)
+    cp composer.json $(Build.BinariesDirectory)
+    cp jsconfig.json $(Build.BinariesDirectory)
+    cp modules_statuses.json $(Build.BinariesDirectory)
+    cp postcss.config.js $(Build.BinariesDirectory)
+    cp tailwind.config.js $(Build.BinariesDirectory)
+  displayName: 'Copy individual file'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/tosca-hris-dev.zip'
+    replaceExistingArchive: true
+  displayName: 'Archive artifacts'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/tosca-hris-dev.zip'
+    ArtifactName: 'app'
+    publishLocation: 'Container'
+
+
