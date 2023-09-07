@@ -28,8 +28,7 @@ steps:
     php -version
     rm composer.lock
     chmod 755 storage
-    yarn set version berry
-    yarn set version 2.x
+    yarn set version 1.12.19
     yarn install
     yarn build
   displayName: 'Use PHP version $(phpVersion)'
