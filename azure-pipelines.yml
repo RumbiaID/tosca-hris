@@ -140,13 +140,13 @@ steps:
     rootFolderOrFile: '$(Build.BinariesDirectory)'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/tosca-hris-dev.zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/hris.zip'
     replaceExistingArchive: true
   displayName: 'Archive artifacts'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/tosca-hris-dev.zip'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/hris.zip'
     ArtifactName: 'app'
     publishLocation: 'Container'
 
