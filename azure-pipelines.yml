@@ -1,5 +1,5 @@
 trigger:
-  - development
+  - master
 
 pool:
   vmImage: ubuntu-latest
@@ -31,6 +31,7 @@ steps:
     yarn set version berry
     yarn set version 2.x
     yarn install
+    yarn build
   displayName: 'Use PHP version $(phpVersion)'
 
 - script: composer install --no-interaction --prefer-dist
@@ -115,14 +116,6 @@ steps:
     TargetFolder: '$(Build.BinariesDirectory)/database'
     OverWrite: true
   displayName: 'Copy database'
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)/node_modules'
-    Contents: '**'
-    TargetFolder: '$(Build.BinariesDirectory)/node_modules'
-    OverWrite: true
-  displayName: 'Copy node modules'
 
 - task: CopyFiles@2
   inputs:
