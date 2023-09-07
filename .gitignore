@@ -16,3 +16,4 @@ yarn-error.log
 /.vscode
 /coverage
 firebase-credential.json
+.DS_Store
