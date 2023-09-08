@@ -1,0 +1,41 @@
+# used by aws codedeploy
+
+version: 0.0
+os: linux
+files:
+  - source: /app
+    destination: /data/heroes/app
+  - source: /storage
+    destination: /data/heroes/storage
+  - source: /bootstrap
+    destination: /data/heroes/bootstrap
+  - source: /config
+    destination: /data/heroes/config
+  - source: /app.env
+    destination: /data/heroes/
+  - source: /public
+    destination: /data/heroes/public
+  - source: /resources
+    destination: /data/heroes/resources
+  - source: /routes
+    destination: /data/heroes/routes
+  - source: /vendor
+    destination: /data/heroes/vendor
+  - source: /composer.json
+    destination: /data/heroes/
+  - source: /artisan
+    destination: /data/heroes/
+  - source: /lang
+    destination: /data/heroes/lang
+  - source: /database
+    destination: /data/heroes/database
+
+hooks:
+  BeforeInstall:
+    - location: .scripts/before_install.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: .scripts/after_install.sh
+      timeout: 300
+      runas: root
