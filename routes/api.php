@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\File\FileController;
 use App\Http\Controllers\Api\V1\Auth\AuthenticationController;
 use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\V1\Server\ServerController;
+use App\Http\Controllers\Api\V1\Server\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
